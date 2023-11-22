@@ -37,8 +37,25 @@ nvc-dhl-tracker
     Automatically track and record records for NVC shipments!
 
 
-A longer description of your project goes here...
+Installation
+============
 
+::
+
+     pip install -e "."
+
+Eventually, we will push it to pypi.org and you can install it with
+
+::
+
+    pip install -e nvc-dhl-tracker
+
+Usage
+=====
+
+- Follow the gspread documentation to create a service account: https://docs.gspread.org/en/latest/
+- Create a new sheet in the document and copy the ID out of the URL, this will be the tracking sheet ID.
+- Create a new sheet in the document and copy the ID out of the URL, this will be the meta sheet ID.
 
 .. _pyscaffold-notes:
 
