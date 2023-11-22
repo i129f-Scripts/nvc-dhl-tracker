@@ -14,7 +14,7 @@ path = "/track/shipments"
 
 headers = {
     "Accept": "application/json",
-    "DHL-API-Key": "GeaWTrJf08irgRInANiTuvhz3NYNHG9R",
+    "DHL-API-Key": "...",
 }
 
 
