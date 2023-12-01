@@ -68,17 +68,26 @@ And answer the questions it asks. You should be able to let this run indefinitel
 As a SystemD service
 --------------------
 
+Before running as a systemd service you should run the command with a `--start-number` to seed the database. Otherwise if
+the service crashes it will restart from the previous start number which may be significantly out of date.
+
 ::
 
-   [Unit]
-   Description=i129f SystemD Service
+    /root/i129fvenv/bin/python -m i129f.nvc_dhl_tracker.cli --no-input --dhl-keys [..., ...] --start-number [...] --google-spreadsheet-url [...] --google-sheet-id [...]
 
-   [Service]
-   ExecStart=/root/i129fvenv/bin/python -m i129f.nvc_dhl_tracker.cli --no-input --dhl-keys [..., ...] --start-number [...] --google-spreadsheet-url [...] --google-sheet-id [...]
-   Restart=on-failure
+The command below does not include `--start-number` to make it easier to copy and paste.
 
-   [Install]
-   WantedBy=multi-user.target
+::
+
+    [Unit]
+    Description=i129f SystemD Service
+
+    [Service]
+    ExecStart=/root/i129fvenv/bin/python -m i129f.nvc_dhl_tracker.cli --no-input --dhl-keys [..., ...] --google-spreadsheet-url [...] --google-sheet-id [...]
+    Restart=on-failure
+
+    [Install]
+    WantedBy=multi-user.target
 
 * **no-input**: This disables any input from the command, so that it won't interrupt a daemonized service
 * **dhl-keys**: The keys to use with the DHL API
