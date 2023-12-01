@@ -32,34 +32,84 @@ class Command(BaseCommand):
     help = "Runs the NVC tracker"
 
     def add_arguments(self, parser):
-        ...
+        parser.add_argument(
+            "--no-input",
+            action="store_true",
+            help="Don't ask for input",
+        )
+        parser.add_argument(
+            "--dhl-keys",
+            nargs="+",
+            type=str,
+            help="The DHL API keys to add to the project",
+        )
+        parser.add_argument(
+            "--clear-keys",
+            action="store_true",
+            help="Delete all DHL API keys",
+        )
+        parser.add_argument(
+            "--start-number",
+            nargs="1",
+            type=str,
+            help="The DHL package number to start with",
+        )
+        parser.add_argument(
+            "--google-spreadsheet-url",
+            nargs="1",
+            type=str,
+            help="The Google spreadsheet URL",
+        )
+        parser.add_argument(
+            "--google-sheet-id",
+            nargs="1",
+            type=str,
+            help="The ID of the page of the spreadsheet",
+        )
 
     def handle(self, *args, **options):
         dhl_keys = DhlApiKey.objects.all()
-        if positive(
-            input(
-                f"You have {dhl_keys.count()} DHL "
-                f"keys setup, do you want to remove them? "
+        allow_input = not options["no-input"]
+
+        if (
+            options["clear_keys"]
+            or allow_input
+            and positive(
+                input(
+                    f"You have {dhl_keys.count()} DHL "
+                    f"keys setup, do you want to remove them? "
+                )
             )
         ):
             dhl_keys.delete()
 
-        while key := input(
-            "If you want to add new DHL API keys enter "
-            "them now, leave blank when finished: "
+        while allow_input and (
+            key := input(
+                "If you want to add new DHL API keys enter "
+                "them now, leave blank when finished: "
+            )
         ):
             DhlApiKey.objects.create(key=key)
 
-        if not DhlPackage.objects.last():
+        for key in options["dhl-keys"]:
+            DhlApiKey.objects.create(key=key)
+
+        if starting_number := options["start-number"]:
+            ...
+        if not DhlPackage.objects.last() and allow_input:
             starting_number = input(
                 "What DHL package number should we start tracking at? "
             )
-        else:
+        elif not starting_number:
             self.stdout.write(f"Starting at {DhlPackage.objects.last().number}")
             starting_number = DhlPackage.objects.last().number
 
-        google_spreadsheet = input("What is the google spreadsheet URL? ")
-        google_sheet = input("What is the google sheet id? ")
+        google_spreadsheet = options["google-spreadsheet-url"] or (
+            allow_input and input("What is the google spreadsheet URL? ")
+        )
+        google_sheet = options["google-sheet-id"] or (
+            allow_input and input("What is the google sheet id? ")
+        )
         keys = get_dhl_key()
         next_number = starting_number
         asyncio.run(
