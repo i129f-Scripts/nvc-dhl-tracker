@@ -31,7 +31,7 @@ def update_google_sheet(sheet_key, sheet, dhl_packages: Iterable[DhlPackage]):
             package.became_pre_transit.isoformat(),
             package.became_transit.isoformat(),
             package.became_delivered.isoformat(),
-            (package.became_pre_transit - package.became_delivered).total_seconds(),
+            (package.became_delivered - package.became_pre_transit).total_seconds(),
         ]
 
     sh.get_worksheet_by_id(sheet).update(range_name="A1", values=list(table.values()))
