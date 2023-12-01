@@ -89,10 +89,10 @@ class Command(BaseCommand):
                 "them now, leave blank when finished: "
             )
         ):
-            DhlApiKey.objects.create(key=key)
+            DhlApiKey.objects.get_or_create(key=key)
 
         for key in options["dhl-keys"]:
-            DhlApiKey.objects.create(key=key)
+            DhlApiKey.objects.get_or_create(key=key)
 
         if starting_number := options["start-number"]:
             ...
