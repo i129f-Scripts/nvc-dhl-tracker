@@ -9,3 +9,14 @@ def run_from_cli():
     django.setup()
     call_command("migrate")
     call_command("run_nvc_tracker")
+
+
+if __name__ == "__main__":
+    """
+    You can call this like
+
+    ::
+
+        python -m i129f.nvc_dhl_tracker.cli
+    """
+    run_from_cli()
