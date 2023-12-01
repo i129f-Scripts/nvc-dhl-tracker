@@ -80,6 +80,11 @@ As a SystemD service
    [Install]
    WantedBy=multi-user.target
 
+* **no-input**: This disables any input from the command, so that it won't interrupt a daemonized service
+* **dhl-keys**: The keys to use with the DHL API
+* **start-number**: The number from which to start polling
+* **google-spreadsheet-url**: The URL of the Google spreadsheet
+* **google-sheet-id**: The ID of the sheet in the spreadsheet to use. This is appended to the URL if you view the spreadsheet in your browser.
 
 .. _pyscaffold-notes:
 
