@@ -54,8 +54,16 @@ Usage
 =====
 
 - Follow the gspread documentation to create a service account: https://docs.gspread.org/en/latest/
+- Copy the URL of the google spreadsheet
 - Create a new sheet in the document and copy the ID out of the URL, this will be the tracking sheet ID.
-- Create a new sheet in the document and copy the ID out of the URL, this will be the meta sheet ID.
+
+Then run
+
+::
+
+    python manage.py run_nvc_tracker
+
+And answer the questions it asks. You should be able to let this run indefinitely, but eventually the database will fill up.
 
 .. _pyscaffold-notes:
 
