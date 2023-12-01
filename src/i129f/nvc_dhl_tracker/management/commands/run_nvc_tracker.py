@@ -145,7 +145,7 @@ async def update_google(spreadsheet_id, sheet_id):
     while True:
         query = DhlPackage.objects.filter(
             updated__gt=dt.datetime.now() - dt.timedelta(days=30),
-        )
+        ).order_by("number")
         data = await database_sync_to_async(list)(query)
         update_google_sheet(spreadsheet_id, sheet_id, data)
         # await asyncio.sleep(60 * 60 * 24)
