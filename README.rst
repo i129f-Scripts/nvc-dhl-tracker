@@ -42,13 +42,13 @@ Installation
 
 ::
 
-     pip install -e "."
+    pip install nvc-dhl-tracker
 
-Eventually, we will push it to pypi.org and you can install it with
+Or clone from github and run
 
 ::
 
-    pip install -e nvc-dhl-tracker
+     pip install -e "."
 
 Usage
 =====

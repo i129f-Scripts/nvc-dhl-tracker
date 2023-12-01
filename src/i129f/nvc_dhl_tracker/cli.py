@@ -1,5 +1,6 @@
+import os
+
 import django
-from coverage.annotate import os
 from django.core.management import call_command
 
 
