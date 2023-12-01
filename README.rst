@@ -61,7 +61,7 @@ Then run
 
 ::
 
-    python manage.py run_nvc_tracker
+    i129f_nvc_tracker
 
 And answer the questions it asks. You should be able to let this run indefinitely, but eventually the database will fill up.
 
