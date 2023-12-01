@@ -9,7 +9,12 @@ from django.db.models import Q
 
 from i129f.nvc_dhl_tracker.dhl import query_dhl_number
 from i129f.nvc_dhl_tracker.google import update_google_sheet
-from i129f.nvc_dhl_tracker.models import DhlApiKey, DhlPackage
+from i129f.nvc_dhl_tracker.models import (
+    DhlApiKey,
+    DhlKeyUsage,
+    DhlPackage,
+    GoogleKeyUsage,
+)
 
 
 def positive(answer: str):
@@ -61,6 +66,7 @@ class Command(BaseCommand):
             run(
                 async_query(keys, next_number, 1.0, self.stdout.write),
                 update_google(google_spreadsheet, google_sheet),
+                clean_db_of_packages(),
             )
         )
 
@@ -82,6 +88,20 @@ def get_dhl_key():
 
     keys = DhlApiKey.objects.filter(Q(exhausted=False))
     return random.choice(keys)
+
+
+async def clean_db_of_packages():
+    while True:
+        await DhlPackage.objects.filter(
+            updated__lt=dt.datetime.now() - dt.timedelta(days=31)
+        ).adelete()
+        await DhlKeyUsage.objects.filter(
+            updated__lt=dt.datetime.now() - dt.timedelta(days=2)
+        ).adelete()
+        await GoogleKeyUsage.objects.filter(
+            updated__lt=dt.datetime.now() - dt.timedelta(days=2)
+        ).adelete()
+        await asyncio.sleep(60 * 60 * 12)
 
 
 @database_sync_to_async
