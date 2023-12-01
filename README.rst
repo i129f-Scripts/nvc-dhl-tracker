@@ -65,6 +65,22 @@ Then run
 
 And answer the questions it asks. You should be able to let this run indefinitely, but eventually the database will fill up.
 
+As a SystemD service
+--------------------
+
+::
+
+   [Unit]
+   Description=i129f SystemD Service
+
+   [Service]
+   ExecStart=/root/i129fvenv/bin/python -m i129f.nvc_dhl_tracker.cli --no-input --dhl-keys [..., ...] --start-number [...] --google-spreadsheet-url [...] --google-sheet-id [...]
+   Restart=on-failure
+
+   [Install]
+   WantedBy=multi-user.target
+
+
 .. _pyscaffold-notes:
 
 Making Changes & Contributing
