@@ -69,17 +69,17 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        options = defaultdict(bool)
+        options = defaultdict(bool, options)
         dhl_keys = DhlApiKey.objects.all()
-        allow_input = "no-input" not in options
-        if (
-            options["clear_keys"]
-            or allow_input
-            and positive(
-                input(
-                    f"You have {dhl_keys.count()} DHL "
-                    f"keys setup, do you want to remove them? "
-                )
+        allow_input = "no_input" not in options
+
+        if options["clear_keys"]:
+            dhl_keys.delete()
+
+        if allow_input and positive(
+            input(
+                f"You have {dhl_keys.count()} DHL "
+                f"keys setup, do you want to remove them? "
             )
         ):
             dhl_keys.delete()
@@ -92,23 +92,30 @@ class Command(BaseCommand):
         ):
             DhlApiKey.objects.get_or_create(key=key)
 
-        for key in options["dhl-keys"]:
+        for key in options["dhl_keys"] or []:
             DhlApiKey.objects.get_or_create(key=key)
 
-        if starting_number := options["start-number"]:
+        if starting_number := options["start_number"]:
             ...
         if not DhlPackage.objects.last() and allow_input:
             starting_number = input(
                 "What DHL package number should we start tracking at? "
             )
         elif not starting_number:
-            self.stdout.write(f"Starting at {DhlPackage.objects.last().number}")
-            starting_number = DhlPackage.objects.last().number
+            try:
+                self.stdout.write(f"Starting at {DhlPackage.objects.last().number}")
+                starting_number = DhlPackage.objects.last().number
+            except AttributeError:
+                self.stderr.write(
+                    "There are no existing tracking numbers in the database, "
+                    "you must supply a starting number!"
+                )
+                return
 
-        google_spreadsheet = options["google-spreadsheet-url"] or (
+        google_spreadsheet = options["google_spreadsheet_url"] or (
             allow_input and input("What is the google spreadsheet URL? ")
         )
-        google_sheet = options["google-sheet-id"] or (
+        google_sheet = options["google_sheet_id"] or (
             allow_input and input("What is the google sheet id? ")
         )
         keys = get_dhl_key()
@@ -199,5 +206,4 @@ async def update_google(spreadsheet_id, sheet_id):
         ).order_by("number")
         data = await database_sync_to_async(list)(query)
         update_google_sheet(spreadsheet_id, sheet_id, data)
-        # await asyncio.sleep(60 * 60 * 24)
-        await asyncio.sleep(30)
+        await asyncio.sleep(60 * 60 * 12)
