@@ -1,6 +1,7 @@
 import asyncio
 import datetime as dt
 import random
+from collections import defaultdict
 
 import httpx
 from channels.db import database_sync_to_async
@@ -50,27 +51,27 @@ class Command(BaseCommand):
         )
         parser.add_argument(
             "--start-number",
-            nargs="1",
+            action="store",
             type=str,
             help="The DHL package number to start with",
         )
         parser.add_argument(
             "--google-spreadsheet-url",
-            nargs="1",
+            action="store",
             type=str,
             help="The Google spreadsheet URL",
         )
         parser.add_argument(
             "--google-sheet-id",
-            nargs="1",
+            action="store",
             type=str,
             help="The ID of the page of the spreadsheet",
         )
 
     def handle(self, *args, **options):
+        options = defaultdict(bool)
         dhl_keys = DhlApiKey.objects.all()
-        allow_input = not options["no-input"]
-
+        allow_input = "no-input" not in options
         if (
             options["clear_keys"]
             or allow_input
