@@ -95,12 +95,6 @@ The command below does not include `--start-number` to make it easier to copy an
 * **google-spreadsheet-url**: The URL of the Google spreadsheet
 * **google-sheet-id**: The ID of the sheet in the spreadsheet to use. This is appended to the URL if you view the spreadsheet in your browser.
 
-You have 1 DHL keys setup, do you want to remove them?
-If you want to add new DHL API keys enter them now, leave blank when finished:
-Starting at JD0030110676223010
-What is the google spreadsheet URL? https://docs.google.com/spreadsheets/d/1Qs7_BaMRvUzr11YNc4b_JxahToGTf3knXFt_9Tjh5-c/
-What is the google sheet id? 692605677
-
 
 .. _pyscaffold-notes:
 

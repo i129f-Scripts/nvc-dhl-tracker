@@ -1,6 +1,7 @@
 from typing import Iterable
 
 import gspread
+from gspread import NoValidUrlKeyFound
 
 from i129f.nvc_dhl_tracker.models import DhlPackage, GoogleKeyUsage
 from i129f.nvc_dhl_tracker.signals.sender import google_request_made
@@ -8,7 +9,13 @@ from i129f.nvc_dhl_tracker.signals.sender import google_request_made
 
 def update_google_sheet(sheet_key, sheet, dhl_packages: Iterable[DhlPackage]):
     gc = gspread.service_account()
-    sh = gc.open_by_url(sheet_key)
+    try:
+        sh = gc.open_by_url(sheet_key)
+    except NoValidUrlKeyFound as e:
+        raise ValueError(
+            f"GSpread could not open the google spreadsheet. "
+            f"Is `{sheet_key}` a URL of a valid Google spreadsheet?"
+        ) from e
     table = {
         "headers": [
             "Tracking Number",

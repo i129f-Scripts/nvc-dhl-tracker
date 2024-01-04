@@ -45,6 +45,12 @@ class Command(BaseCommand):
             help="The DHL API keys to add to the project",
         )
         parser.add_argument(
+            "--dhl-request-delay",
+            action="store",
+            type=float,
+            help="The delay between DHL API requests",
+        )
+        parser.add_argument(
             "--clear-keys",
             action="store_true",
             help="Delete all DHL API keys",
@@ -69,9 +75,15 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
+        try:
+            return self.inner_handle(*args, **options)
+        except KeyboardInterrupt:
+            self.stderr.write("Keyboard Interrupt detected. Cancelling...")
+
+    def inner_handle(self, *args, **options):
         options = defaultdict(bool, options)
         dhl_keys = DhlApiKey.objects.all()
-        allow_input = "no_input" not in options
+        allow_input = not options["no_input"]
 
         if options["clear_keys"]:
             dhl_keys.delete()
@@ -95,8 +107,9 @@ class Command(BaseCommand):
         for key in options["dhl_keys"] or []:
             DhlApiKey.objects.get_or_create(key=key)
 
-        if starting_number := options["start_number"]:
-            ...
+        dhl_api_delay = options.get("dhl_request_delay", 1.0)
+
+        starting_number = options["start_number"]
         if not DhlPackage.objects.last() and allow_input:
             starting_number = input(
                 "What DHL package number should we start tracking at? "
@@ -112,17 +125,26 @@ class Command(BaseCommand):
                 )
                 return
 
-        google_spreadsheet = options["google_spreadsheet_url"] or (
+        google_spreadsheet = options.get("google_spreadsheet_url", "") or (
             allow_input and input("What is the google spreadsheet URL? ")
         )
-        google_sheet = options["google_sheet_id"] or (
+        google_sheet = options.get("google_sheet_id", 0) or (
             allow_input and input("What is the google sheet id? ")
         )
         keys = get_dhl_key()
         next_number = starting_number
+
+        self.stdout.write(
+            "Running with:"
+            f"\n\tStarting number={next_number}"
+            f"\n\tDHL API Delay={dhl_api_delay}"
+            f"\n\tGoogle spreadsheet URL={google_spreadsheet}"
+            f"\n\tGoogle sheet ID={google_sheet}"
+        )
+
         asyncio.run(
             run(
-                async_query(keys, next_number, 1.0, self.stdout.write),
+                async_query(keys, next_number, dhl_api_delay, self.stdout.write),
                 update_google(google_spreadsheet, google_sheet),
                 clean_db_of_packages(),
             )
